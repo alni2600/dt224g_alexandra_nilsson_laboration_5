@@ -6,6 +6,7 @@
 
 // Hämta element från DOM
 const form = document.querySelector("#studentform");
+const submitButton = document.querySelector("#generate");
 const clearButton = document.querySelector("#clear");
 
 const fullnameInput = document.querySelector("#fullname");
@@ -21,7 +22,6 @@ const errorList = document.querySelector("#errorlist");
 const historySection = document.querySelector("#history");
 const deleteHistoryButton = document.querySelector("#delete");
 
-
 // Array som används för felmeddelanden
 let errors = [];
 
@@ -32,6 +32,7 @@ let history = [];
  * Validerar formulärets inmatning.
  * @returns {boolean}
  */
+
 function validateForm() {
     // Kontrollera formulärets obligatoriska fält
 
@@ -55,11 +56,22 @@ function displayErrors() {
  * Skapar ett studentkort och visar det på sidan.
  */
 function createStudentCard() {
-    // Hämta information från formuläret
-
+   // Hämta information från formuläret
+    const name = fullnameInput.value;
+    const email = emailInput.value;
+    const phone = phoneInput.value;
+    const font = fontSelect.value;
+    
     // Uppdatera studentkortet
+    previewFullname.textContent = name;
+    previewEmail.textContent = email;
+    previewPhone.textContent = phone;
+    previewFullname.style.fontFamily = font;
+    previewEmail.style.fontFamily = font;
+    previewPhone.style.fontFamily = font;
 
     // Lägg till studentkortet i historiken
+    
 
     // Spara och uppdatera historiken
 }
@@ -113,18 +125,31 @@ function deleteHistory() {
 }
 
 
-// Eventlyssnare
+// Eventlyssnare - när användaren klickar på "Skapa studentkort"
+submitButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    // När formuläret skickas:
+    // - validera inmatningen
+    validateForm();
 
-// När formuläret skickas:
-// - validera inmatningen
 // - skapa studentkort om valideringen lyckas
-
+    createStudentCard();
+    saveHistory();
+});
 
 // När användaren klickar på "Rensa"
-
+clearButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    // Rensa formulär och felmeddelanden
+    clearForm();
+});
 
 // När användaren klickar på "Radera historik"
-
+deleteHistoryButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    //anropa funktionen deleteHistory() för att radera historiken
+    deleteHistory();
+});
 
 // När sidan laddas:
 // - läs in och visa eventuell tidigare historik
