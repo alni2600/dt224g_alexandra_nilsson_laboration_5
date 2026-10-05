@@ -34,9 +34,36 @@ let history = [];
  */
 
 function validateForm() {
-    // Kontrollera formulärets obligatoriska fält
+    // Kontrollera formulärets obligatoriska fält. 
+    //Först kontrolleras att fälten faktiskt innehåller något, sedan görs ytterligare ett test
+
+    //Kontrollera att namn inte är tomt, inte är kortare än 3 tecken och inte längre än 50 tecken
+    if (fullnameInput.value.trim() === "") {
+        errors.push("Fullständigt namn är obligatoriskt.");
+    } else if (fullnameInput.value.trim().length < 3 || fullnameInput.value.trim().length > 50) {
+        errors.push("Namn måste vara mellan 3 och 50 tecken.");
+    }
+
+    //Kontrollera epostadress 
+    if (emailInput.value.trim() === "") {
+        errors.push("E-postadress är obligatoriskt.");
+    } else if (!emailInput.value.includes("@")) {
+        errors.push("Ange en giltig e-postadress.");
+    }
+
+    //Kontrollera telefonnummer - att det inte är tomt och att det består av siffror
+    if (phoneInput.value.trim() === "") {
+        errors.push("Telefonnummer är obligatoriskt.");
+    } else if (isNaN(phoneInput.value)) {
+        errors.push("Telefonnumret måste bestå av siffror.");   
+    } else if (phoneInput.value.trim().length < 7 || phoneInput.value.trim().length > 15) {
+        errors.push("Telefonnumret måste vara mellan 7 och 15 siffror.");
+    }
+    //Om fonten inte väljs blir det den första, alltså måste den inte kontrolleras
+
 
     // Visa eventuella felmeddelanden
+    displayErrors();
 
     // Returnera resultatet (true eller false) av valideringen
 }
@@ -49,6 +76,7 @@ function displayErrors() {
     // Rensa tidigare felmeddelanden
 
     // Skriv ut aktuella felmeddelanden till DOM
+    console.log(errors);
 }
 
 
@@ -66,6 +94,7 @@ function createStudentCard() {
     previewFullname.textContent = name;
     previewEmail.textContent = email;
     previewPhone.textContent = phone;
+    // Ändra fonten på studentkortet
     previewFullname.style.fontFamily = font;
     previewEmail.style.fontFamily = font;
     previewPhone.style.fontFamily = font;
@@ -109,7 +138,17 @@ function renderHistory() {
  * Rensar formulär, aktuellt studentkort och felmeddelanden.
  */
 function clearForm() {
-    // Återställ formulär och studentkort
+    // Återställ formulär och studentkort genom att tömma input-fälten och återställa fonten till standard
+    fullnameInput.value = "";
+    emailInput.value = "";
+    phoneInput.value = "";
+    fontSelect.value = "Arial";
+    previewFullname.textContent = "";
+    previewEmail.textContent = "";
+    previewPhone.textContent = "";
+    previewFullname.style.fontFamily = "Georgia";
+    previewEmail.style.fontFamily = "Georgia";
+    previewPhone.style.fontFamily = "Georgia";
 
     // Rensa eventuella felmeddelanden
 }
