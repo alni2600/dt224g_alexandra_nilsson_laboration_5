@@ -17,12 +17,12 @@ const previewFullname = document.querySelector("#previewfullname");
 const previewEmail = document.querySelector("#previewemail");
 const previewPhone = document.querySelector("#previewphone");
 
-const errorList = document.querySelector("#errorlist");
+const errorListUl = document.querySelector("#errorlist");
 const historySection = document.querySelector("#history");
 const deleteHistoryButton = document.querySelector("#delete");
 
 // Array som används för felmeddelanden
-let errors = [];
+let errorsArr = [];
 
 // Array som innehåller sparade studentkort
 let history = [];
@@ -33,44 +33,47 @@ let history = [];
  */
 
 function validateForm() {
-    // Kontrollera formulärets obligatoriska fält. 
+    //rensa tidigare felmeddelanden
+    errorsArr = [];
+    errorListUl.innerHTML = "";
 
     //Kontrollerar om fälten är tomma
     if (fullnameInput.value.trim() === "") {
-        errors.push("Fullständigt namn är obligatoriskt.");
+        errorsArr.push("Fullständigt namn är obligatoriskt.");
     } 
     if (emailInput.value.trim() === "") {
-        errors.push("E-postadress är obligatoriskt.");
+        errorsArr.push("E-postadress är obligatoriskt.");
     } 
       if (phoneInput.value.trim() === "") {
-        errors.push("Telefonnummer är obligatoriskt.");
+        errorsArr.push("Telefonnummer är obligatoriskt.");
     } 
     
     //kontrollerar om namn är mellan 3 och 50 tecken långt
     if (fullnameInput.value.trim().length < 3 || fullnameInput.value.trim().length > 50) {
-        errors.push("Namn måste vara mellan 3 och 50 tecken.");
+        errorsArr.push("Namn måste vara mellan 3 och 50 tecken.");
     }
 
     //kontrollerar om e-postadressen innehåller ett @-tecken
+    //egentligen onödig eftersom detta kontrolleras i html-koden
     if (!emailInput.value.includes("@")) {
-        errors.push("E-postadressen måste ha ett giltigt format.");
+        errorsArr.push("E-postadressen måste ha ett giltigt format.");
     }
 
     //kontrollerar om telefonnumret består av siffror och är mellan 7 och 15 tecken långt
-    if (!Number.isInteger(phoneInput.value.trim())) {
-        errors.push("Telefonnumret måste bestå av siffror.");   
-    } 
     if (phoneInput.value.trim().length < 7 || phoneInput.value.trim().length > 15) {
-        errors.push("Telefonnumret måste vara mellan 7 och 15 siffror långt.");
+        errorsArr.push("Telefonnumret måste vara mellan 7 och 15 siffror långt.");
     }
+   
+   // funkar inte, återkom senare
+    // if (!Number.isInteger(phoneInput.value.trim())) {
+    //     errorsArr.push("Telefonnumret måste bestå av siffror.");   
+    // } 
+
 
     //Om fonten inte väljs blir det den första, alltså måste den inte kontrolleras
 
-    // Visa eventuella felmeddelanden
-    displayErrors(errors);
-
-    // Returnera resultatet (true eller false) av valideringen
-    if (errors.length > 0) {
+    // Visa eventuella felmeddelanden och returnera resultatet (true eller false) av valideringen
+    if (errorsArr.length > 0) {
         return false; // Valideringen misslyckades
     } else {
         return true; // Valideringen lyckades
@@ -83,19 +86,21 @@ function validateForm() {
  */
 function displayErrors() {
     // Rensa tidigare felmeddelandens
-    
+
 
     //loopar igenom errors-arrayen
-    for (let i = 0; i < errors.length; i++) {
+    for (let i = 0; i < errorsArr.length; i++) {
         //Skapar ett li-element för varje felmeddelande
-        let errorsEl = document.createElement("li");
-        //skapar en textnod med felmeddelandet
-        let errorText = document.createTextNode(errors[i]);
-
+        const liEl = document.createElement("li");
+        
+        //skapar en textnod med felmeddelandet som hämtas från errors-arrayen
+        let errorText = document.createTextNode(errorsArr[i]);
+        
         //lägger till felmeddelandet i li-elementet
-        errorsEl.appendChild(errorText);   
+        liEl.appendChild(errorText);   
+        
         //lägger till li-elementet i ul-elementet
-        errorList.appendChild(errorsEl);
+        errorListUl.appendChild(liEl);
     };
 
     // Skriv ut aktuella felmeddelanden till DOM
@@ -134,6 +139,7 @@ function createStudentCard() {
  */
 function saveHistory() {
     // Spara history i localStorage
+    
 }
 
 
@@ -168,8 +174,8 @@ function clearForm() {
     fontSelect.value = "Georgia";
 
     // Rensa eventuella felmeddelanden
-    errorList.innerHTML = "";
-    errors = [];
+    errorListUl.innerHTML = "";
+    errorsArr = [];
     
 }
 
@@ -189,15 +195,15 @@ form.addEventListener("submit", (event) => {
     event.preventDefault();
 
     // När formuläret skickas:
-    // - validera inmatningen
-    validateForm();
-
-// - skapa studentkort om valideringen lyckas
-    if (validateForm === true) {
+    // kör funktionen validateForm som validerar inmatningen och kollar om den är true eller false
+    if (validateForm() === true) {
+        //om allt är korrekt ifyllt skapas studentkortet
         createStudentCard();
+    } else {
+        //om något är fel skrivs felmeddelanden ut på sidan
+        displayErrors();
     }
 });
-
 
 // När användaren klickar på "Rensa"
 clearButton.addEventListener("click", clearForm);
