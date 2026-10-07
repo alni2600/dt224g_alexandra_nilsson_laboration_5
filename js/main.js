@@ -47,28 +47,6 @@ function validateForm() {
       if (phoneInput.value.trim() === "") {
         errorsArr.push("Telefonnummer är obligatoriskt.");
     } 
-    
-    //kontrollerar om namn är mellan 3 och 50 tecken långt
-    if (fullnameInput.value.trim().length < 3 || fullnameInput.value.trim().length > 50) {
-        errorsArr.push("Namn måste vara mellan 3 och 50 tecken.");
-    }
-
-    //kontrollerar om e-postadressen innehåller ett @-tecken
-    //egentligen onödig eftersom detta kontrolleras i html-koden
-    if (!emailInput.value.includes("@")) {
-        errorsArr.push("E-postadressen måste ha ett giltigt format.");
-    }
-
-    //kontrollerar om telefonnumret består av siffror och är mellan 7 och 15 tecken långt
-    if (phoneInput.value.trim().length < 7 || phoneInput.value.trim().length > 15) {
-        errorsArr.push("Telefonnumret måste vara mellan 7 och 15 siffror långt.");
-    }
-   
-   // funkar inte, återkom senare
-    // if (!Number.isInteger(phoneInput.value.trim())) {
-    //     errorsArr.push("Telefonnumret måste bestå av siffror.");   
-    // } 
-
 
     //Om fonten inte väljs blir det den första, alltså måste den inte kontrolleras
 
@@ -85,8 +63,7 @@ function validateForm() {
  * Visar felmeddelanden på sidan.
  */
 function displayErrors() {
-    // Rensa tidigare felmeddelandens
-
+    //tömmer tidigare felmeddelanden först i validateForm() istället
 
     //loopar igenom errors-arrayen
     for (let i = 0; i < errorsArr.length; i++) {
@@ -102,8 +79,6 @@ function displayErrors() {
         //lägger till li-elementet i ul-elementet
         errorListUl.appendChild(liEl);
     };
-
-    // Skriv ut aktuella felmeddelanden till DOM
 }
 
 
@@ -138,7 +113,6 @@ function createStudentCard() {
  * Sparar historiken i localStorage.
  */
 function saveHistory() {
-    // Spara history i localStorage
     // Hämta information från formuläret och skapar variabler av dem
     let name = fullnameInput.value.trim();
     let email = emailInput.value.trim();
@@ -164,17 +138,17 @@ function saveHistory() {
     historyArr = [];
     }
 
-    //historyArr redan deklarerad (helt på toppen av sidan)
-    //lägger till studentkorten i history-arrayen
-    historyArr.push(studentCardObject);
+    //lägger till studentkorten FÖRST i history-arrayen
+    historyArr.unshift(studentCardObject);
 
     //konverterar arrayen till JSON-sträng 
     const historyArrJSON = JSON.stringify(historyArr);
 
     //sparar i localStorage. Nykelnamn Studentcards och det är informationen i arrayen (i JSON-format) som sparas
     localStorage.setItem("StudentCards", historyArrJSON);
-    renderHistory();
 
+    //skriver ut historiken på sidan
+    renderHistory();
 }
 
 
@@ -214,15 +188,12 @@ function renderHistory() {
         const historyPEl = document.createElement("p");
 
         //lägger till innehåll i p-taggen
-        historyPEl.innerHTML = `Namn: ${historyArr[i].name} <br> Epost: ${historyArr[i].email} <br> Telefon: ${historyArr[i].phone}`
+        historyPEl.innerHTML = `Namn: ${historyArr[i].name} <br> Epost: ${historyArr[i].email} <br> Telefon: ${historyArr[i].phone} <br> Font: ${historyArr[i].font}`
         
         // lägger till p-taggen med innehåll i vårt div-element
         historySection.appendChild(historyPEl);  
     }
  }
-
-
-
 
 /**
  * Rensar formulär, aktuellt studentkort och felmeddelanden.
@@ -238,7 +209,6 @@ function clearForm() {
     errorListUl.innerHTML = "";
     errorsArr = [];
 }
-
 
 /**
  * Raderar hela historiken.
