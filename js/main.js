@@ -25,7 +25,7 @@ const deleteHistoryButton = document.querySelector("#delete");
 let errorsArr = [];
 
 // Array som innehåller sparade studentkort
-let history = [];
+let historyArr = [];
 
 /**
  * Validerar formulärets inmatning.
@@ -139,7 +139,39 @@ function createStudentCard() {
  */
 function saveHistory() {
     // Spara history i localStorage
+       // Hämta information från formuläret och skapar variabler av dem
+    let name = fullnameInput.value.trim();
+    let email = emailInput.value.trim();
+    let phone = phoneInput.value.trim();
+    let font = fontSelect.value;
     
+    //skapar ett "objekt" som innehåller informationen från formuläret
+    const studentCardObject = {
+        name: name,
+        email: email,
+        phone: phone,
+        font: font
+    };
+    
+    //hämtar historiken i localStorage
+    const localStorageData = localStorage.getItem("historyArr");
+
+    historyArr = JSON.parse(localStorageData);
+    if (historyArr === null){
+        historyArr = [];
+    }
+
+    //lägger till studentkorten i history-arrayen (redan deklarerad)
+    historyArr.push(studentCardObject);
+
+     //konverterar till JSON-sträng
+    const StudentCardObjectJSON = JSON.stringify(historyArr);
+
+    //sparar i localStorage
+    localStorage.setItem("historyArr", StudentCardObjectJSON);
+
+    renderHistory();
+ 
 }
 
 
@@ -157,9 +189,41 @@ function loadHistory() {
  * Visar historiken på sidan.
  */
 function renderHistory() {
+    //hämtar historiken i localStorage
+    const localStorageData = localStorage.getItem("historyArr");
+
+    //konverterar till JSON-sträng
+    const StudentCardObjectJSON = JSON.stringify(historyArr);
+    
+    //om historyArr är null sätter vi den till en tom array
+    if (historyArr === null){
+        historyArr = [];
+    }
+
+    //om det inte finns några värden i arrayen returnerar vi här och ingen mer kod körs
+    if(historyArr.length === 0){
+        return
+    }
+    
+    //om det finns värden i arrayen loopar vi igenom arrayen
+    for (let i = 0; i < historyArr.length; i++) {
+       //history är ett div-element i html-koden (historySection i js-koden, deklarerad på rad 21)
+       
+       //skapar en p-tagg
+        const historyPEl = document.createElement("p");
+
+        //lägger till innehåll i p-taggen
+        historyPEl.innerHTML = `Namn: ${historyArr[i].name} <br> Epost: ${historyArr[i].email} <br> Telefon: ${historyArr[i].phone}`
+        
+        // lägger till p-taggen med innehåll i vårt div-element
+        historySection.appendChild(historyPEl);  
+    }
+
     // Rensa tidigare visad historik
+    
 
     // Skriv ut innehållet i history till DOM
+
 }
 
 
@@ -197,7 +261,7 @@ form.addEventListener("submit", (event) => {
     // När formuläret skickas:
     // kör funktionen validateForm som validerar inmatningen och kollar om den är true eller false
     if (validateForm() === true) {
-        //om allt är korrekt ifyllt skapas studentkortet
+        //om allt är korrekt ifyllt skapas studentkortet (saveHistory() körs också i createStudentCard())
         createStudentCard();
     } else {
         //om något är fel skrivs felmeddelanden ut på sidan
