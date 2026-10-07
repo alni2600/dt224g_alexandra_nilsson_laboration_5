@@ -139,7 +139,7 @@ function createStudentCard() {
  */
 function saveHistory() {
     // Spara history i localStorage
-       // Hämta information från formuläret och skapar variabler av dem
+    // Hämta information från formuläret och skapar variabler av dem
     let name = fullnameInput.value.trim();
     let email = emailInput.value.trim();
     let phone = phoneInput.value.trim();
@@ -153,25 +153,28 @@ function saveHistory() {
         font: font
     };
     
-    //hämtar historiken i localStorage
-    const localStorageData = localStorage.getItem("historyArr");
+   //hämtar historiken i localStorage
+    const localStorageData = localStorage.getItem("StudentCards");
 
+    //omvandlar historyArr till JS (redan deklarerad)
     historyArr = JSON.parse(localStorageData);
+
+    //testar om arrayen är tom, och i så fall tömmer den
     if (historyArr === null){
-        historyArr = [];
+    historyArr = [];
     }
 
-    //lägger till studentkorten i history-arrayen (redan deklarerad)
+    //historyArr redan deklarerad (helt på toppen av sidan)
+    //lägger till studentkorten i history-arrayen
     historyArr.push(studentCardObject);
 
-     //konverterar till JSON-sträng
-    const StudentCardObjectJSON = JSON.stringify(historyArr);
+    //konverterar arrayen till JSON-sträng 
+    const historyArrJSON = JSON.stringify(historyArr);
 
-    //sparar i localStorage
-    localStorage.setItem("historyArr", StudentCardObjectJSON);
-
+    //sparar i localStorage. Nykelnamn Studentcards och det är informationen i arrayen (i JSON-format) som sparas
+    localStorage.setItem("StudentCards", historyArrJSON);
     renderHistory();
- 
+
 }
 
 
@@ -189,27 +192,25 @@ function loadHistory() {
  * Visar historiken på sidan.
  */
 function renderHistory() {
-    //hämtar historiken i localStorage
-    const localStorageData = localStorage.getItem("historyArr");
+    //rensar den utskrivna historiken så att det inte dubbleras
+    historySection.innerHTML = "";
 
-    //konverterar till JSON-sträng
-    const StudentCardObjectJSON = JSON.stringify(historyArr);
+    //hämtar historiken i localStorage
+    const localStorageData = localStorage.getItem("StudentCards");
+
+    //omvandlar historyArr till JS (redan deklarerad)
+    historyArr = JSON.parse(localStorageData);
     
     //om historyArr är null sätter vi den till en tom array
     if (historyArr === null){
-        historyArr = [];
-    }
-
-    //om det inte finns några värden i arrayen returnerar vi här och ingen mer kod körs
-    if(historyArr.length === 0){
         return
     }
     
     //om det finns värden i arrayen loopar vi igenom arrayen
     for (let i = 0; i < historyArr.length; i++) {
        //history är ett div-element i html-koden (historySection i js-koden, deklarerad på rad 21)
-       
-       //skapar en p-tagg
+
+       //skapar <p></p>
         const historyPEl = document.createElement("p");
 
         //lägger till innehåll i p-taggen
@@ -218,13 +219,9 @@ function renderHistory() {
         // lägger till p-taggen med innehåll i vårt div-element
         historySection.appendChild(historyPEl);  
     }
+ }
 
-    // Rensa tidigare visad historik
-    
 
-    // Skriv ut innehållet i history till DOM
-
-}
 
 
 /**
@@ -240,7 +237,6 @@ function clearForm() {
     // Rensa eventuella felmeddelanden
     errorListUl.innerHTML = "";
     errorsArr = [];
-    
 }
 
 
@@ -248,9 +244,14 @@ function clearForm() {
  * Raderar hela historiken.
  */
 function deleteHistory() {
-    // Radera sparad historik
+    // Radera sparad historik från web storage (webbläsarens minne)
+    localStorage.clear();
 
-    // Uppdatera history och visningen på sidan
+    // Uppdatera arrayen som lagrat studentkorten, tömmer den
+    historyArr = [];
+
+    //Laddar om sidan. Den testar alltså historyArr.length === 0, och eftersom arrayen är tom stannar sidan där. 
+    renderHistory();
 }
 
 
@@ -263,6 +264,7 @@ form.addEventListener("submit", (event) => {
     if (validateForm() === true) {
         //om allt är korrekt ifyllt skapas studentkortet (saveHistory() körs också i createStudentCard())
         createStudentCard();
+        clearForm();
     } else {
         //om något är fel skrivs felmeddelanden ut på sidan
         displayErrors();
@@ -278,3 +280,4 @@ deleteHistoryButton.addEventListener("click", deleteHistory);
 
 // När sidan laddas:
 // - läs in och visa eventuell tidigare historik
+renderHistory();
