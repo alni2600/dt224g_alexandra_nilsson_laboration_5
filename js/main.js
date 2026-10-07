@@ -6,7 +6,6 @@
 
 // Hämta element från DOM
 const form = document.querySelector("#studentform");
-const submitButton = document.querySelector("#generate");
 const clearButton = document.querySelector("#clear");
 
 const fullnameInput = document.querySelector("#fullname");
@@ -35,37 +34,47 @@ let history = [];
 
 function validateForm() {
     // Kontrollera formulärets obligatoriska fält. 
-    //Först kontrolleras att fälten faktiskt innehåller något, sedan görs ytterligare ett test
 
-    //Kontrollera att namn inte är tomt, inte är kortare än 3 tecken och inte längre än 50 tecken
+    //Kontrollerar om fälten är tomma
     if (fullnameInput.value.trim() === "") {
         errors.push("Fullständigt namn är obligatoriskt.");
-    } else if (fullnameInput.value.trim().length < 3 || fullnameInput.value.trim().length > 50) {
+    } 
+    if (emailInput.value.trim() === "") {
+        errors.push("E-postadress är obligatoriskt.");
+    } 
+      if (phoneInput.value.trim() === "") {
+        errors.push("Telefonnummer är obligatoriskt.");
+    } 
+    
+    //kontrollerar om namn är mellan 3 och 50 tecken långt
+    if (fullnameInput.value.trim().length < 3 || fullnameInput.value.trim().length > 50) {
         errors.push("Namn måste vara mellan 3 och 50 tecken.");
     }
 
-    //Kontrollera epostadress 
-    if (emailInput.value.trim() === "") {
-        errors.push("E-postadress är obligatoriskt.");
-    } else if (!emailInput.value.includes("@")) {
-        errors.push("Ange en giltig e-postadress.");
+    //kontrollerar om e-postadressen innehåller ett @-tecken
+    if (!emailInput.value.includes("@")) {
+        errors.push("E-postadressen måste ha ett giltigt format.");
     }
 
-    //Kontrollera telefonnummer - att det inte är tomt och att det består av siffror
-    if (phoneInput.value.trim() === "") {
-        errors.push("Telefonnummer är obligatoriskt.");
-    } else if (isNaN(phoneInput.value)) {
+    //kontrollerar om telefonnumret består av siffror och är mellan 7 och 15 tecken långt
+    if (!Number.isInteger(phoneInput.value.trim())) {
         errors.push("Telefonnumret måste bestå av siffror.");   
-    } else if (phoneInput.value.trim().length < 7 || phoneInput.value.trim().length > 15) {
-        errors.push("Telefonnumret måste vara mellan 7 och 15 siffror.");
+    } 
+    if (phoneInput.value.trim().length < 7 || phoneInput.value.trim().length > 15) {
+        errors.push("Telefonnumret måste vara mellan 7 och 15 siffror långt.");
     }
+
     //Om fonten inte väljs blir det den första, alltså måste den inte kontrolleras
 
-
     // Visa eventuella felmeddelanden
-    displayErrors();
+    displayErrors(errors);
 
     // Returnera resultatet (true eller false) av valideringen
+    if (errors.length > 0) {
+        return false; // Valideringen misslyckades
+    } else {
+        return true; // Valideringen lyckades
+    }
 }
 
 
@@ -73,10 +82,23 @@ function validateForm() {
  * Visar felmeddelanden på sidan.
  */
 function displayErrors() {
-    // Rensa tidigare felmeddelanden
+    // Rensa tidigare felmeddelandens
+    
+
+    //loopar igenom errors-arrayen
+    for (let i = 0; i < errors.length; i++) {
+        //Skapar ett li-element för varje felmeddelande
+        let errorsEl = document.createElement("li");
+        //skapar en textnod med felmeddelandet
+        let errorText = document.createTextNode(errors[i]);
+
+        //lägger till felmeddelandet i li-elementet
+        errorsEl.appendChild(errorText);   
+        //lägger till li-elementet i ul-elementet
+        errorList.appendChild(errorsEl);
+    };
 
     // Skriv ut aktuella felmeddelanden till DOM
-    console.log(errors);
 }
 
 
@@ -85,22 +107,23 @@ function displayErrors() {
  */
 function createStudentCard() {
    // Hämta information från formuläret
-    const name = fullnameInput.value;
-    const email = emailInput.value;
-    const phone = phoneInput.value;
-    const font = fontSelect.value;
+    let name = fullnameInput.value.trim();
+    let email = emailInput.value.trim();
+    let phone = phoneInput.value.trim();
+    let font = fontSelect.value;
     
     // Uppdatera studentkortet
     previewFullname.textContent = name;
     previewEmail.textContent = email;
     previewPhone.textContent = phone;
+
     // Ändra fonten på studentkortet
     previewFullname.style.fontFamily = font;
     previewEmail.style.fontFamily = font;
     previewPhone.style.fontFamily = font;
 
     // Lägg till studentkortet i historiken
-    
+    saveHistory();
 
     // Spara och uppdatera historiken
 }
@@ -142,15 +165,12 @@ function clearForm() {
     fullnameInput.value = "";
     emailInput.value = "";
     phoneInput.value = "";
-    fontSelect.value = "Arial";
-    previewFullname.textContent = "";
-    previewEmail.textContent = "";
-    previewPhone.textContent = "";
-    previewFullname.style.fontFamily = "Georgia";
-    previewEmail.style.fontFamily = "Georgia";
-    previewPhone.style.fontFamily = "Georgia";
+    fontSelect.value = "Georgia";
 
     // Rensa eventuella felmeddelanden
+    errorList.innerHTML = "";
+    errors = [];
+    
 }
 
 
@@ -165,30 +185,26 @@ function deleteHistory() {
 
 
 // Eventlyssnare - när användaren klickar på "Skapa studentkort"
-submitButton.addEventListener("click", (event) => {
+form.addEventListener("submit", (event) => {
     event.preventDefault();
+
     // När formuläret skickas:
     // - validera inmatningen
     validateForm();
 
 // - skapa studentkort om valideringen lyckas
-    createStudentCard();
-    saveHistory();
+    if (validateForm === true) {
+        createStudentCard();
+    }
 });
+
 
 // När användaren klickar på "Rensa"
-clearButton.addEventListener("click", (event) => {
-    event.preventDefault();
-    // Rensa formulär och felmeddelanden
-    clearForm();
-});
+clearButton.addEventListener("click", clearForm);
 
 // När användaren klickar på "Radera historik"
-deleteHistoryButton.addEventListener("click", (event) => {
-    event.preventDefault();
-    //anropa funktionen deleteHistory() för att radera historiken
-    deleteHistory();
-});
+deleteHistoryButton.addEventListener("click", deleteHistory);
+
 
 // När sidan laddas:
 // - läs in och visa eventuell tidigare historik
