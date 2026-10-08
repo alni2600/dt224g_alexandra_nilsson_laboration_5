@@ -128,15 +128,7 @@ function saveHistory() {
     };
     
    //hämtar historiken i localStorage
-    const localStorageData = localStorage.getItem("StudentCards");
-
-    //omvandlar historyArr till JS (redan deklarerad)
-    historyArr = JSON.parse(localStorageData);
-
-    //testar om arrayen är tom, och i så fall tömmer den
-    if (historyArr === null){
-    historyArr = [];
-    }
+    historyArr = loadHistory();
 
     //lägger till studentkorten FÖRST i history-arrayen
     historyArr.unshift(studentCardObject);
@@ -156,9 +148,17 @@ function saveHistory() {
  * Läser in tidigare historik från localStorage.
  */
 function loadHistory() {
+    
     // Hämta eventuell sparad historik
+    const localStorageData = localStorage.getItem("StudentCards");
 
-    // Uppdatera history
+    //om historyArr är null sätter vi den till en tom array
+    if (historyArr === null){
+        return [];
+    } else {
+        //omvandlar historyArr till JS (redan deklarerad)
+        return historyArr = JSON.parse(localStorageData);
+    }
 }
 
 
@@ -169,15 +169,12 @@ function renderHistory() {
     //rensar den utskrivna historiken så att det inte dubbleras
     historySection.innerHTML = "";
 
-    //hämtar historiken i localStorage
-    const localStorageData = localStorage.getItem("StudentCards");
+    //Hämtar historiken
+    historyArr = loadHistory();
 
-    //omvandlar historyArr till JS (redan deklarerad)
-    historyArr = JSON.parse(localStorageData);
-    
-    //om historyArr är null sätter vi den till en tom array
-    if (historyArr === null){
-        return
+    //om historiken är tom behöver vi inte loopa
+    if (historyArr.length === 0){
+        return;
     }
     
     //om det finns värden i arrayen loopar vi igenom arrayen
