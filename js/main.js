@@ -152,8 +152,8 @@ function loadHistory() {
     // Hämta eventuell sparad historik
     const localStorageData = localStorage.getItem("StudentCards");
 
-    //om historyArr är null sätter vi den till en tom array
-    if (historyArr === null){
+    //om localStorageData är null sätter vi den till en tom array
+    if (localStorageData === null){
         return [];
     } else {
         //omvandlar historyArr till JS (redan deklarerad)
